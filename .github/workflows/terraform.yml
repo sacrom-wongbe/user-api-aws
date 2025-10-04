@@ -5,12 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - 'infra/**'
-      - 'boostrap/**'
+      - 'bootstrap/**'  
   pull_request:
     branches: [ "main" ]
     paths:
       - 'infra/**'
-      - 'boostrap/**'
+      - 'bootstrap/**'  
 
 permissions:
   id-token: write   # This is required for requesting the JWT
