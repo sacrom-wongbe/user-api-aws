@@ -13,14 +13,14 @@ on:
       - 'bootstrap/**'  
 
 permissions:
-  id-token: write   # This is required for requesting the JWT
-  contents: read    # This is required for actions/checkout
+  id-token: write
+  contents: read
 
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-
+    environment: production
 
     defaults:
       run:
@@ -36,13 +36,13 @@ jobs:
         echo "GITHUB_REF: $GITHUB_REF"
         echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
         echo "GITHUB_ENVIRONMENT: $GITHUB_ENVIRONMENT"
-        echo "AWS_ROLE_ARN: ${{ env.AWS_ROLE_ARN }}"
+        echo "AWS_ROLE_ARN: arn:aws:iam::590713443503:role/prod-github-actions-role"
 
     # Configure AWS credentials using OIDC
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        role-to-assume: arn:aws:iam::590713443503:role/prod-github-actions-role
         role-session-name: terraform-github-actions
         aws-region: us-west-2
 
@@ -70,10 +70,10 @@ jobs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       working-directory: ./infra
-      run: terraform plan -input=false -var="alert_email=${{ env.ALERT_EMAIL }}"
+      run: terraform plan -input=false -var="alert_email=aws.admin@future-force.org"
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ./infra
-      run: terraform apply -auto-approve -input=false -var="alert_email=${{ env.ALERT_EMAIL }}"
+      run: terraform apply -auto-approve -input=false -var="alert_email=aws.admin@future-force.org"
