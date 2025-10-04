@@ -61,7 +61,7 @@ resource "aws_iam_openid_connect_provider" "github_oidc" {
 
 # Create IAM role for GitHub Actions with OIDC trust
 resource "aws_iam_role" "github_actions_role" {
-  name = "${var.environment}-github-actions-role"
+  name = "${var.environment}-gh-actions-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",

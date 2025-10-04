@@ -36,13 +36,13 @@ jobs:
         echo "GITHUB_REF: $GITHUB_REF"
         echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
         echo "GITHUB_ENVIRONMENT: $GITHUB_ENVIRONMENT"
-        echo "AWS_ROLE_ARN: arn:aws:iam::590713443503:role/prod-github-actions-role"
+        echo "AWS_ROLE_ARN: arn:aws:iam::590713443503:role/prod-gh-actions-role"
 
     # Configure AWS credentials using OIDC
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::590713443503:role/prod-github-actions-role
+        role-to-assume: arn:aws:iam::590713443503:role/prod-gh-actions-role
         role-session-name: terraform-github-actions
         aws-region: us-west-2
 
