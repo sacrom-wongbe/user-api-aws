@@ -20,7 +20,7 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: production
+
 
     defaults:
       run:
@@ -30,6 +30,13 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Print GitHub Context
+      run: |
+        echo "GITHUB_REF: $GITHUB_REF"
+        echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+        echo "GITHUB_ENVIRONMENT: $GITHUB_ENVIRONMENT"
+        echo "AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}"
 
     # Configure AWS credentials using OIDC
     - name: Configure AWS credentials
@@ -70,10 +77,3 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ./infra
       run: terraform apply -auto-approve -input=false -var="alert_email=${{ secrets.ALERT_EMAIL }}"
-
-    - name: Print GitHub Context
-      run: |
-        echo "GITHUB_REF: $GITHUB_REF"
-        echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
-        echo "GITHUB_ENVIRONMENT: $GITHUB_ENVIRONMENT"
-        echo "AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}"
