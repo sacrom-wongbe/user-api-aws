@@ -96,26 +96,18 @@ resource "aws_iam_policy" "github_actions_terraform_policy" {
       {
         Effect = "Allow",
         Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket",
-          "s3:GetBucketVersioning"
-        ],
-        Resource = [
-          aws_s3_bucket.terraform_state.arn,
-          "${aws_s3_bucket.terraform_state.arn}/*"
-        ]
-      },
-      {
-        Effect = "Allow",
-        Action = [
           "ec2:*",
           "lambda:*",
           "dynamodb:*",
           "apigateway:*",
           "iam:*",
-          "logs:*"
+          "logs:*",
+          "s3:*",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath",
+          "ssm:PutParameter",
+          "guardduty:*"
         ],
         Resource = "*"
       }
