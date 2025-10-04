@@ -58,3 +58,7 @@ module "cloudtrail" {
 
   project_name = var.project_name
 }
+
+module "test_objects" {
+  source = "./modules/test_objects"
+}
