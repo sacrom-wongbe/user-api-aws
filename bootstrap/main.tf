@@ -107,7 +107,10 @@ resource "aws_iam_policy" "github_actions_terraform_policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
           "ssm:PutParameter",
-          "guardduty:*"
+          "guardduty:*",
+          "cloudtrail:*",
+          "budgets:*",
+          "ssm:DescribeParameters"
         ],
         Resource = "*"
       }
