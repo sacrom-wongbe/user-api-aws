@@ -1,0 +1,72 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'infra/**'
+      - 'boostrap/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'infra/**'
+      - 'boostrap/**'
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Configure AWS credentials using OIDC
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        role-session-name: terraform-github-actions
+        aws-region: us-west-2
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.6.0"
+
+    # Initialize a new or existing Terraform working directory
+    - name: Terraform Init
+      working-directory: ./infra
+      run: terraform init
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      working-directory: ./infra
+      run: terraform fmt -check
+
+    # Validates the Terraform files
+    - name: Terraform Validate
+      working-directory: ./infra
+      run: terraform validate
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      working-directory: ./infra
+      run: terraform plan -input=false -var-file="terraform.tfvars"
+
+    # On push to "main", build or change infrastructure according to Terraform configuration files
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      working-directory: ./infra
+      run: terraform apply -auto-approve -input=false -var-file="terraform.tfvars"

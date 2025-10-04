@@ -98,9 +98,10 @@ resource "aws_apigatewayv2_integration" "getinteraction" {
 
 # Lambda Authorizer
 resource "aws_apigatewayv2_authorizer" "hmac_authorizer" {
-  api_id           = aws_apigatewayv2_api.main.id
-  authorizer_type  = "REQUEST"
-  authorizer_uri   = var.hmac_authorizer_lambda_arn
+  api_id                           = aws_apigatewayv2_api.main.id
+  authorizer_type                  = "REQUEST"
+  authorizer_uri                   = var.hmac_authorizer_lambda_arn
+  authorizer_payload_format_version = "2.0"
   identity_sources = [
     "$request.header.x-signature",
     "$request.header.X-timestamp",
@@ -109,45 +110,8 @@ resource "aws_apigatewayv2_authorizer" "hmac_authorizer" {
   name             = "hmac-authorizer"
 }
 
-# API Routes
-resource "aws_apigatewayv2_route" "getme" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "GET /me"
-  target    = "integrations/${aws_apigatewayv2_integration.getme.id}"
-}
-
-resource "aws_apigatewayv2_route" "updateme" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "PUT /me"
-  target    = "integrations/${aws_apigatewayv2_integration.updateme.id}"
-}
-
-resource "aws_apigatewayv2_route" "getitem" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "GET /items/{itemId}"
-  target    = "integrations/${aws_apigatewayv2_integration.getitem.id}"
-}
-
-resource "aws_apigatewayv2_route" "putitem" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "PUT /items/{itemId}"
-  target    = "integrations/${aws_apigatewayv2_integration.putitem.id}"
-}
-
-resource "aws_apigatewayv2_route" "postinteraction" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "POST /interactions"
-  target    = "integrations/${aws_apigatewayv2_integration.postinteraction.id}"
-}
-
-resource "aws_apigatewayv2_route" "getinteraction" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "GET /interactions/{userId}"
-  target    = "integrations/${aws_apigatewayv2_integration.getinteraction.id}"
-}
-
 # API Routes with authorization
-resource "aws_apigatewayv2_route" "getme_auth" {
+resource "aws_apigatewayv2_route" "getme" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "GET /me"
   target             = "integrations/${aws_apigatewayv2_integration.getme.id}"
@@ -155,7 +119,7 @@ resource "aws_apigatewayv2_route" "getme_auth" {
   authorizer_id      = aws_apigatewayv2_authorizer.hmac_authorizer.id
 }
 
-resource "aws_apigatewayv2_route" "updateme_auth" {
+resource "aws_apigatewayv2_route" "updateme" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "PUT /me"
   target             = "integrations/${aws_apigatewayv2_integration.updateme.id}"
@@ -163,7 +127,7 @@ resource "aws_apigatewayv2_route" "updateme_auth" {
   authorizer_id      = aws_apigatewayv2_authorizer.hmac_authorizer.id
 }
 
-resource "aws_apigatewayv2_route" "getitem_auth" {
+resource "aws_apigatewayv2_route" "getitem" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "GET /items/{itemId}"
   target             = "integrations/${aws_apigatewayv2_integration.getitem.id}"
@@ -171,7 +135,7 @@ resource "aws_apigatewayv2_route" "getitem_auth" {
   authorizer_id      = aws_apigatewayv2_authorizer.hmac_authorizer.id
 }
 
-resource "aws_apigatewayv2_route" "putitem_auth" {
+resource "aws_apigatewayv2_route" "putitem" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "PUT /items/{itemId}"
   target             = "integrations/${aws_apigatewayv2_integration.putitem.id}"
@@ -179,7 +143,7 @@ resource "aws_apigatewayv2_route" "putitem_auth" {
   authorizer_id      = aws_apigatewayv2_authorizer.hmac_authorizer.id
 }
 
-resource "aws_apigatewayv2_route" "postinteraction_auth" {
+resource "aws_apigatewayv2_route" "postinteraction" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "POST /interactions"
   target             = "integrations/${aws_apigatewayv2_integration.postinteraction.id}"
@@ -187,7 +151,7 @@ resource "aws_apigatewayv2_route" "postinteraction_auth" {
   authorizer_id      = aws_apigatewayv2_authorizer.hmac_authorizer.id
 }
 
-resource "aws_apigatewayv2_route" "getinteraction_auth" {
+resource "aws_apigatewayv2_route" "getinteraction" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "GET /interactions/{userId}"
   target             = "integrations/${aws_apigatewayv2_integration.getinteraction.id}"

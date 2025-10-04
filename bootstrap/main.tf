@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.aws_region
+}
+
 terraform {
   required_providers {
     aws = {
@@ -7,13 +11,10 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-}
 
 # S3 bucket for Terraform state
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "${var.project_name}-terraform-state"
+  bucket = "${var.project_name}-terraform-state-590713443503"
 
   tags = {
     Name        = "Terraform State Bucket"
@@ -137,4 +138,31 @@ output "github_actions_role_arn" {
 
 output "aws_region" {
   value = var.aws_region
+}
+
+# AWS Budget - $50 monthly limit with alerts
+resource "aws_budgets_budget" "monthly_cost_budget" {
+  name         = "${var.project_name}-monthly-budget"
+  budget_type  = "COST"
+  limit_amount = "50"
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                 = 80
+    threshold_type            = "PERCENTAGE"
+    notification_type         = "ACTUAL"
+    subscriber_email_addresses = [var.alert_email]
+  }
+
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                 = 100
+    threshold_type            = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_email_addresses = [var.alert_email]
+  }
+
+  depends_on = [aws_s3_bucket.terraform_state]
 }

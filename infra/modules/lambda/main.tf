@@ -302,3 +302,39 @@ resource "aws_lambda_permission" "hmac_authorizer" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${var.api_gateway_execution_arn}/*/*"
 }
+
+# Remove all CloudWatch Log Group resources - let AWS manage them automatically
+resource "aws_cloudwatch_log_group" "getme_logs" {
+  name              = "/aws/lambda/getMe"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "updateme_logs" {
+  name              = "/aws/lambda/updateMe"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "getitem_logs" {
+  name              = "/aws/lambda/getItem"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "putitem_logs" {
+  name              = "/aws/lambda/putItem"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "postinteraction_logs" {
+  name              = "/aws/lambda/postInteraction"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "getinteraction_logs" {
+  name              = "/aws/lambda/getInteractions"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "hmacauthorizer_logs" {
+  name              = "/aws/lambda/hmacAuthorizer"
+  retention_in_days = 14
+}

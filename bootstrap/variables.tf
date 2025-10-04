@@ -10,6 +10,7 @@ variable "project_name" {
   type        = string
   default     = "futureforce-user-api"
 }
+
 variable "environment" {
   type        = string
   description = "The environment (e.g., dev, prod)"
@@ -26,4 +27,9 @@ variable "github_branch" {
   description = "GitHub branch to allow access"
   type        = string
   default     = "main"
+}
+
+variable "alert_email" {
+  description = "Email address for AWS Budget alerts"
+  type        = string
 }

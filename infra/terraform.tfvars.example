@@ -1,0 +1,4 @@
+region = "us-west-2"
+project_name = "futureforce-user-api"
+environment = "production"
+account_id = "590713443503"
