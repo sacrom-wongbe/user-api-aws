@@ -63,10 +63,17 @@ jobs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       working-directory: ./infra
-      run: terraform plan -input=false -var-file="terraform.tfvars"
+      run: terraform plan -input=false -var="alert_email=${{ secrets.ALERT_EMAIL }}"
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ./infra
-      run: terraform apply -auto-approve -input=false -var-file="terraform.tfvars"
+      run: terraform apply -auto-approve -input=false -var="alert_email=${{ secrets.ALERT_EMAIL }}"
+
+    - name: Print GitHub Context
+      run: |
+        echo "GITHUB_REF: $GITHUB_REF"
+        echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+        echo "GITHUB_ENVIRONMENT: $GITHUB_ENVIRONMENT"
+        echo "AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}"
