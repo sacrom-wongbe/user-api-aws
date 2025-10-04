@@ -71,9 +71,9 @@ jobs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       working-directory: ./infra
-      run: terraform plan -input=false -var="alert_email=${{ secrets.ALERT_EMAIL }}"
+      run: terraform plan -input=false
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       working-directory: ./infra
-      run: terraform apply -auto-approve -input=false -var="alert_email=${{ secrets.ALERT_EMAIL }}"
+      run: terraform apply -auto-approve -input=false
