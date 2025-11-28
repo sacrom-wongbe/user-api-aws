@@ -14,7 +14,7 @@ variable "project_name" {
 variable "environment" {
   type        = string
   description = "The environment (e.g., dev, prod)"
-  default     = "prod"
+  default     = "dev"//prod
 }
 
 variable "github_repo" {
@@ -26,7 +26,7 @@ variable "github_repo" {
 variable "github_branch" {
   description = "GitHub branch to allow access"
   type        = string
-  default     = "main"
+  default     = "vincent"//main
 }
 
 variable "alert_email" {

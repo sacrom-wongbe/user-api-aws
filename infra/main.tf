@@ -16,7 +16,8 @@ terraform {
     key            = "infra/terraform.tfstate"
     region         = "us-west-2"
     encrypt        = true
-    use_lockfile   = true         # Replace deprecated dynamodb_table parameter
+    # use_lockfile = true #replacing this with below. not sure if this boolean was to be used 
+    dynamodb_table = "futureforce-user-api-terraform-state-lock"
   }
 }
 
