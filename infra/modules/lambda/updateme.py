@@ -9,8 +9,11 @@ dynamodb = boto3.resource("dynamodb")
 users_table = dynamodb.Table(os.environ["USERS_TABLE"])
 
 def lambda_handler(event, context):
+    # Normalize headers to lowercase for consistent access
+    raw_headers = event.get("headers") or {}
+    headers = {k.lower(): v for k, v in raw_headers.items()}
     # Actor is passed from the Lambda Authorizer (hmacAuthorizer)
-    actor = (event.get("headers") or {}).get("x-actor")
+    actor = headers.get("x-actor")
     if not actor:
         return response(401, {"error": "Unauthorized"})
     

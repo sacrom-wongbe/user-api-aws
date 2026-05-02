@@ -1,3 +1,7 @@
+'''
+puts items(like buttons)???
+'''
+
 import boto3
 import os
 import json
@@ -12,8 +16,11 @@ dynamodb = boto3.resource("dynamodb")
 items_table = dynamodb.Table(os.environ["ITEMS_TABLE"])
 
 def lambda_handler(event, context):
+    # Normalize headers to lowercase for consistent access
+    raw_headers = event.get("headers") or {}
+    headers = {k.lower(): v for k, v in raw_headers.items()}
     # This should eventually check admin auth, for now allow if signed
-    actor = event.get("requestContext", {}).get("authorizer", {}).get("actor")
+    actor = headers.get("x-actor")
     if not actor or not actor.startswith("user:"):
         return response(403, {"error": "Only users (admins) can create/update items"})
     try:

@@ -1,3 +1,7 @@
+'''
+get user's interaction history
+'''
+
 import boto3
 import os
 import json
@@ -9,18 +13,28 @@ interactions_table = dynamodb.Table(os.environ["INTERACTIONS_TABLE"])
 STRICT_EVENT_TYPES = {"VIEW", "LIKE", "PURCHASE", "COMMENT", "SHARE"}
 
 def lambda_handler(event, context):
-    # Extract headers from event
-    headers = event.get("headers", {}) or {}
+    # Normalize headers to lowercase for consistent access
+    raw_headers = event.get("headers", {}) or {}
+    headers = {k.lower(): v for k, v in raw_headers.items()}
     # Actor from authorizer
-    actor = headers.get("x-actor") or headers.get("X-Actor")
+    actor = headers.get("x-actor")
     if not actor or not (actor.startswith("user:") or actor.startswith("guest:")):
         return response(401, {"error": "Unauthorized or invalid actorId format"})
 
     try:
+        path_params = event.get("pathParameters") or {}
+        requested_user = path_params.get("userId")
+        if requested_user and requested_user != actor:
+            return response(403, {"error": "Path userId does not match authenticated actor"})
+
         query_params = event.get("queryStringParameters") or {}
 
         # limit
-        limit = int(query_params.get("limit", 20))
+        limit_raw = query_params.get("limit", "20")
+        try:
+            limit = int(limit_raw)
+        except ValueError:
+            return response(400, {"error": "limit must be an integer"})
         if limit <= 0 or limit > 100:
             limit = 20
 
@@ -55,7 +69,7 @@ def response(code, obj):
     return {
         "statusCode": code,
         "headers": cors(),
-        "body": json.dumps(obj)
+        "body": json.dumps(obj, default=str)
     }
 
 def cors():

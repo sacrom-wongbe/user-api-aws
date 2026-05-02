@@ -23,12 +23,14 @@ terraform {
 
 module "lambda" {
   source = "./modules/lambda"
+  environment = var.environment
   
-  api_gateway_execution_arn = module.api_gateway.execution_arn
+  # api_gateway_execution_arn = module.api_gateway.execution_arn #removed to break circular dependency
 }
 
 module "api_gateway" {
   source = "./modules/api_gateway"
+  environment = var.environment
   
   # Pass Lambda ARNs to API Gateway
   getme_lambda_arn             = module.lambda.getme_lambda_arn
@@ -42,24 +44,29 @@ module "api_gateway" {
 
 module "ssm_parameter_store" {
   source = "./modules/ssm_parameter_store"
+  environment = var.environment
 }
 
 module "dynamodb" {
   source = "./modules/dynamodb"
+  environment = var.environment
 }
 
 module "guardduty" {
   source        = "./modules/guardduty"
+  environment = var.environment
 
   project_name = var.project_name
 }
 
 module "cloudtrail" {
   source = "./modules/cloudtrail"
+  environment = var.environment
 
   project_name = var.project_name
 }
 
 module "test_objects" {
   source = "./modules/test_objects"
+  environment = var.environment
 }

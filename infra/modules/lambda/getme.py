@@ -7,8 +7,10 @@ dynamodb = boto3.resource("dynamodb")
 users_table = dynamodb.Table(os.environ["USERS_TABLE"])
 
 def lambda_handler(event, context):
-    headers = event.get("headers") or {}
-    actor = headers.get("x-actor") or headers.get("X-Actor")
+    # Normalize headers to lowercase for consistent access
+    raw_headers = event.get("headers") or {}
+    headers = {k.lower(): v for k, v in raw_headers.items()}
+    actor = headers.get("x-actor")
     
     if not actor:
         return {
@@ -33,7 +35,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": 200,
                 "headers": cors(),
-                "body": json.dumps(filtered_item)
+                "body": json.dumps(filtered_item, default=str)
             }
         
         elif actor.startswith("guest:"):
@@ -58,7 +60,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": 200,
                 "headers": cors(),
-                "body": json.dumps(stub)
+                "body": json.dumps(stub, default=str)
             }
         
         else:

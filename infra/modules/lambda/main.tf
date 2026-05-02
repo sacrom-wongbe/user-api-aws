@@ -117,7 +117,7 @@ data "archive_file" "updateme_zip" {
 resource "aws_lambda_function" "updateMe" {
     function_name = "updateMe"
     role          = aws_iam_role.wix-recs-lambda-role.arn
-    handler       = "getme.lambda_handler"
+    handler       = "updateme.lambda_handler"
     runtime       = "python3.13"
     
     filename         = data.archive_file.updateme_zip.output_path
@@ -152,6 +152,12 @@ resource "aws_lambda_function" "getItem" {
       }
     }
 }
+
+# gemini: by default, TF doesnt own these log groups. adding this allows it so that it can clean it up on environment destory. otherwise, it'll be left behind and clutter.
+# resource "aws_cloudwatch_log_group" "getitem_logs" {
+#   name              = "/aws/lambda/getItem-${var.environment}"
+#   retention_in_days = 14
+# }
 
 # Create zip file from Python source code
 data "archive_file" "putitem_zip" {
@@ -194,7 +200,7 @@ resource "aws_lambda_function" "postInteraction" {
 
     environment {
       variables = {
-        ITEMS_TABLE = "Items"
+        ITEMS_TABLE = "Items",
         INTERACTIONS_TABLE = "Interactions"
       }
     }
@@ -244,63 +250,6 @@ resource "aws_lambda_function" "hmacAuthorizer" {
         HMAC_SECRET_PARAM = "/lambda/hmac-secret"
       }
     }
-}
-
-# Lambda permissions for API Gateway
-resource "aws_lambda_permission" "getme" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.getMe.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "updateme" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.updateMe.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "getitem" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.getItem.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "putitem" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.putItem.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "postinteraction" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.postInteraction.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "getinteraction" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.getInteraction.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "hmac_authorizer" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hmacAuthorizer.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_gateway_execution_arn}/*/*"
 }
 
 # Remove all CloudWatch Log Group resources - let AWS manage them automatically
